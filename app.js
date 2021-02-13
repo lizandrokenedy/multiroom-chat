@@ -19,4 +19,41 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('usuário desconectou')
     })
+
+    socket.on('msgParaServidor', (data) => {
+        //dispara o evento para o próprio usuário de envio de mensagem
+        socket.emit(
+            'msgParaCliente',
+            {
+                apelido: data.apelido,
+                mensagem: data.mensagem
+            }
+        )
+        //dispara o evento para todos conectados no socket de envio de mensagem
+        socket.broadcast.emit(
+            'msgParaCliente',
+            {
+                apelido: data.apelido,
+                mensagem: data.mensagem
+            }
+        )
+
+        if (parseInt(data.apelidoAtualizadoNosClientes) === 0) {
+            //dispara o evento para o próprio usuário de lista de participantes
+            socket.emit(
+                'participantesParaCliente',
+                {
+                    apelido: data.apelido,
+                }
+            )
+            //dispara o evento para todos conectados no socket de lista de participantes
+            socket.broadcast.emit(
+                'participantesParaCliente',
+                {
+                    apelido: data.apelido,
+                }
+            )
+        }
+
+    })
 });

@@ -83,21 +83,8 @@
 
 		<div class="row participantes" id="participantes" style="display:none">
 			<div class="col-md-1"></div>
-			<div class="col-md-10">
-				<span class="participante">
-					<img src="images/ico_usuario.png" />
-					Jorge
-				</span>
-
-				<span class="participante">
-					<img src="images/ico_usuario.png" />
-					José
-				</span>
-
-				<span class="participante">
-					<img src="images/ico_usuario.png" />
-					Fernando
-				</span>
+			<div class="col-md-10" id="pessoas">
+			
 			</div>
 			<div class="col-md-1"></div>
 
@@ -107,16 +94,16 @@
 	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
 		<div class="container">
 			<div class="panel-body campo-mensagem">
-				<form>
-					<div class="col-md-12">
-						<div class="input-group">
-							<input type="text" class="form-control" placeholder="Mensagem">
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button">></button>
-							</span>
-						</div>
+				<div class="col-md-12">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Mensagem" id="mensagem">
+						<input type="hidden" id="apelido" value="<%=dadosForm.apelido%>"  >
+						<input type="hidden" id="apelidoAtualizadoNosClientes" value="0"  >
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="button" id="enviar_mensagem">></button>
+						</span>
 					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	</nav>
@@ -126,17 +113,36 @@
 		crossorigin="anonymous"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		const socket = io('http://localhost:3000')
+		const socket = io('http://localhost:3000');
+		$('#enviar_mensagem').click(function () {
+			socket.emit('msgParaServidor', {apelido: $('#apelido').val(), mensagem: $('#mensagem').val(), apelidoAtualizadoNosClientes: $('#apelidoAtualizadoNosClientes').val()})
+			$('#mensagem').val('')
+			$('#apelidoAtualizadoNosClientes').val(1)
+		})
+
+
 		socket.on('msgParaCliente', (data) => {
-			console.log(data)
 			const html = `
 			<div class="dialogo">
 				<h4>${data.apelido}</h4>
-				<p>${data.mesagem}</p>
+				<p>${data.mensagem}</p>
 		    </div>
 			`;
 
 			$('#dialogos').append(html);
+
+			window.scrollTo(0, document.body.scrollHeight)
+		})
+
+		socket.on('participantesParaCliente', (data) => {
+			const html = `
+			<span class="participante">
+				<img src='images/ico_usuario.png' />
+				${data.apelido}
+		    </span>
+			`;
+
+			$('#pessoas').append(html);
 		})
 	</script>
 </body>
