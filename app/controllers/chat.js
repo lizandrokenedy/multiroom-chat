@@ -1,4 +1,5 @@
-const { application } = require("express");
+// const { application } = require("express");
+// const { emit } = require("../../config/server");
 
 module.exports.iniciarChat = (application, req, res) => {
     const dadosForm = req.body;
@@ -11,6 +12,8 @@ module.exports.iniciarChat = (application, req, res) => {
         res.render('index', {validacao: erros});
         return
     }
+
+    application.get('io').emit('msgParaCliente', {apelido: dadosForm.apelido, mesagem: ' acabou de entrar no chat'});
 
     res.render('chat');
 }
